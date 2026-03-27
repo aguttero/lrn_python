@@ -1,2 +1,3 @@
 .venv/
-book-collection.db
+*.db
+.DS_Store

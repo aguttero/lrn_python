@@ -19,11 +19,43 @@ https://sqlitebrowser.org/dl/
 	Mac terminal:
 	sqlite3 nombre_de_tu_archivo.db para abrir la consola de SQLite.
 
+## Framworks de DB
+	Pequeños
+		SQL Alchemy
+		SQL Model
+		Pewee
+	
+		Django ORM
+		Tortoise ORM (Async / await)
+		Postgre Psycopg
+
+Resumen de alternativas por categoría
+Categoría 	Módulo Destacado	Características
+
+ORM Asíncrono	Tortoise ORM	Inspirado en Django, diseñado específicamente para trabajar con async/await (muy usado con FastAPI).
+
+Bajo nivel (Drivers)	PyMySQL / mysqlclient	Los conectores estándar para bases de datos MySQL.
+
+Drivers (SQL Server)	pyodbc	El estándar para conectar Python con bases de datos de Microsoft.
+
+Query Builders	Pypika	Te permite construir consultas SQL de forma programática sin ser un ORM completo.
+
+---
+
 
 ## Documentation
+# SQL
 https://www.codecademy.com/article/sql-commands
 https://www.w3schools.com/sql/sql_ref_create_table.asp
 
+# SQL Alchemy
+https://docs.sqlalchemy.org/en/20/tutorial/index.html
+YouTube:
+https://www.youtube.com/watch?v=529LYDgRTgQ
+
+
+# Flask - SQLAlchemy
+https://flask-sqlalchemy.palletsprojects.com/en/stable/quickstart/
 
 
 ---
