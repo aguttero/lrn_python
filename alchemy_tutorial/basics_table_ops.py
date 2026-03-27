@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, Float, String, ForeignKey
 # from sqlalchemy.orm import Session
 
 engine = create_engine('sqlite:///./alchemy_tutorial/mydatabase.db', echo=True)
@@ -55,3 +55,5 @@ select_statement = people.select() # Selects all
 result = conn.execute(select_statement)
 for row in result.fetchall():
     print ("updated row:", row)
+
+
