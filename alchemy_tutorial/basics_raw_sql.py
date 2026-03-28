@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
-engine = create_engine('sqlite:///./alchemy_tutorial/sql_database_01.db', echo=True)
+engine = create_engine('sqlite:///./alchemy_tutorial/sql_raw_database_01.db', echo=True)
 # echo=True es el verbose para ver que sucede paso a paso
 
 connection = engine.connect()
