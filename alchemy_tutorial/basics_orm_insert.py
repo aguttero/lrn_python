@@ -57,7 +57,7 @@ try:
     new_person = Person (name='Charlie', age=70)
     session.add(new_person)
 
-    # FLUSH to obtain the person.
+    # FLUSH to obtain the person id
     session.flush()
     
     new_thing = Thing(description='Mouse Pad', value=9.90, owner=new_person.id) # Owner ID inexistente
@@ -94,3 +94,4 @@ print ("-*-" *5)
 # List comprehension
 print ([item.description for item in new_person.things ])
 
+session.close()
