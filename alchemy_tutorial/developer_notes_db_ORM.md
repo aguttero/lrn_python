@@ -27,7 +27,29 @@ if persona_a_borrar:
 2. La Opción de Seguridad (Restrict)
 Si quieres evitar que se borre una persona si todavía tiene cosas asignadas (para proteger la integridad de los datos), debes confiar en el Foreign Key de SQLite que activamos con el PRAGMA.
 
+Si una "Cosa" siempre debe pertenecer a alguien, define la columna como nullable=False. Así, SQLite impedirá que el owner se convierta en NULL
+
 * Requiere el event listener activado para el PRAGMA 
+* Requiere el campo FK como nullable=False -> CONTROL EN SQLITE 
+
+* Por perfomance y limpieza de logs es buena practica que la relación en la tabla de Persona tenga passive_deletes = "all"
+Por defecto, SQLAlchemy intenta "ayudar" seteando los hijos en NULL (Cargando en RAM). Para que sea SQLite quien tome el control y bloquee la operación, debes indicarle a la relación que no intervenga.
+
+La solución definitiva para la Estrategia 2:
+Si quieres que explote el error y no se borre nada, usa nullable=False en la FK. Si por alguna razón necesitas que el campo sea opcional pero que no se pueda borrar el dueño si tiene cosas, entonces la clave es el passive_deletes="all".
+
+
+
+```python
+class Persona(Base):
+    __tablename__ = 'people'
+    id = Column(Integer, primary_key=True)
+    # passive_deletes="all" evita que SQLAlchemy setee en NULL los hijos en memoria
+    things = relationship("Cosa", back_populates="owner", passive_deletes="all")
+```
+
+
+
 
 Código para manejar el error:
 ```python
@@ -62,10 +84,6 @@ def borrar_persona_seguro(persona_id):
         print("Sugerencia: Borra primero sus 'cosas' o reasígnalas a otro dueño.")
 
 ```
-
-
-
-
 
 
 3. La Opción Manual (Sin Cascadas)
@@ -103,3 +121,32 @@ Hay una confusión común aquí:
 * ondelete="CASCADE" en ForeignKey (DB): Esto se pone en la columna del SQL. Es la base de datos la que borra todo instantáneamente. Es rapidísimo, pero SQLAlchemy no se "entera" de qué registros desaparecieron, lo que puede romper tus logs de auditoría.
 
 Recomendación empresarial: Usa siempre el cascade de la relationship (Estrategia 1), ya que mantiene la lógica de negocio y tus logs de auditoría sincronizados con lo que pasa en el disco.
+
+## Escenario de Nullable = True y Passive Delete = all
+
+# Escenario:
+Restringir el borrado, pero permitir registros huérfanos voluntarios".
+
+Tiene sentido cuando quieres que la relación sea opcional, pero no quieres que se rompa por accidente.
+
+# El escenario de negocio: "Activos en Stock"
+Imagina un sistema de inventario donde tienes Empleados y Laptops.
+
+* La regla: Una Laptop puede no estar asignada a nadie (nullable=True), esperando en el almacén.
+* El conflicto: Si una Laptop sí está asignada a "Juan", no quieres que alguien borre a "Juan" del sistema y la laptop quede asignada a un ID fantasma. Quieres que el sistema te obligue a quitarle la laptop a Juan antes de poder despedirlo (borrarlo).
+
+# Por qué usar passive_deletes="all" con nullable=True:
+* Sin passive_deletes: Si borras a Juan, SQLAlchemy pondrá el owner_id de la laptop en NULL automáticamente. Juan desaparece y la laptop vuelve al stock "en silencio".
+* Con passive_deletes="all" (y el PRAGMA activo): Al intentar borrar a Juan, SQLAlchemy no toca la laptop. SQLite detecta que la laptop todavía apunta a Juan y bloquea el borrado.
+
+* Resultado: El sistema te obliga a ser consciente. Debes entrar a la ficha de la laptop, poner el dueño en NULL manualmente (desvincularlo), y entonces ya puedes borrar a Juan.
+
+# Beneficio para el negocio:
+* Evita pérdida de rastro: Impide que registros importantes (como activos, contratos o expedientes) pierdan su referencia histórica de forma automática y silenciosa.
+* Integridad referencial estricta: Aseguras que si un dato apunta a otro, ese "otro" existe, aunque la relación sea opcional.
+
+# Resumen técnica:
+Configuración	                        Comportamiento al borrar al Padre
+nullable=True + Default	                Los hijos se ponen en NULL (desvinculación automática).
+nullable=True + passive_deletes="all"	Error de Integridad (bloqueo hasta desvinculación manual).
+

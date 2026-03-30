@@ -30,7 +30,9 @@ class Person(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     age = Column(Integer)
-
+    
+    # cascade="all, delete-orphan" asegura que al borrar la persona, se borren sus cosas.
+    # SQLAlchemy maneja el borrado (no SQLite3)
     things = relationship('Thing', back_populates='person', cascade="all, delete-orphan")
 
     # Optional: this will allow each book object to be identified by its title when printed.
@@ -55,7 +57,7 @@ session = Session()
 # add person + thing with auto id reference
 
 try:
-    person_to_delete = session.get(Person, 11) # chose person.id 11
+    person_to_delete = session.get(Person, 10) # chose person.id 14
     if person_to_delete:
         session.delete(person_to_delete)
         session.commit()
