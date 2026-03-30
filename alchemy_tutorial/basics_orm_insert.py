@@ -90,7 +90,7 @@ except Exception as e:
 
 ## Relationship dot notation
 print ("new_thing.person.name: ", new_thing.person.name)
-print ("-*-" *5)
+print ("- - +" *5)
 # List comprehension
 print ([item.description for item in new_person.things ])
 

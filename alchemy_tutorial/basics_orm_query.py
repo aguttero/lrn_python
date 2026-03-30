@@ -34,33 +34,15 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-## QUERY
 
+## QUERY
 result = session.query(Person.id, Person.name, Person.age).all()
 print (result)
-
 print ("-*-" * 5)
 
 result = session.query(Thing.owner, Thing.description, Thing.value).all()
 print (result)
-
 print ("-*-" * 5)
-
-# result = session.query(Person).all()
-# print ([item.name for item in result])
-
-# print ("-*-" * 5)
-# # Prints object mem id unless self representation defined in class declrataion
-# # def __repr__(self)
-# result = session.query(Person).all()
-# print (result)
-
-# print (" - - - +" *4)
-# ### QUERY + FILTER
-# result = session.query(Person.name, Person.age).filter(Person.age > 50).all()
-# print ([item.name for item in result])
-# print (" - - - +" *4)
-# print (result)
 
 
 ## QUERY + DELETE
@@ -74,36 +56,24 @@ print ("-*-" * 5)
 
 # result = session.query(Thing).filter(Thing.value < 50).all()
 # print ([f"{item.description}: {item.value}" for item in result])
-
 # print ("-*-" * 5)
 
-## QUERY + UPDATE
-
-result = session.query(Person).filter(Person.name == 'Charlie').update({'name': 'Charles'}) 
-session.commit()
-
-result = session.query(Person.id, Person.name, Person.age).all()
-print (result)
-
-print ("-*-" * 5)
 
 ## QUERY + JOIN
-
 result = session.query(Person.id, Person.name, Thing.description).join(Thing).all()
 print (result)
-
 print ("-*-" * 5)
+
 
 ## GROUPING
 # need to add func to import
-
 result = session.query(Thing.owner, func.sum(Thing.value)).group_by(Thing.owner).all()
 print (result)
-
 print ("-*-" * 5)
 
 result = session.query(Thing.owner, func.sum(Thing.value)).group_by(Thing.owner).having(func.sum(Thing.value)> 50).all()
 print (result)
+
 
 print ("-*-" * 5)
 session.close()
