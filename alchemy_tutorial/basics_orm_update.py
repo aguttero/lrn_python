@@ -55,27 +55,26 @@ session = Session()
 
 ## SESION FLUSH + ERROR HANDLING:
 # add person + thing with auto id reference
+# try:
+#     new_person = Person (name='Mike', age=70)
+#     session.add(new_person)
 
-try:
-    new_person = Person (name='Mike', age=70)
-    session.add(new_person)
-
-    # FLUSH to obtain the person id
-    session.flush()
+#     # FLUSH to obtain the person id
+#     session.flush()
     
-    new_thing = Thing(description='Pen', value=3.90, owner=new_person.id) # Owner ID inexistente
-    session.add(new_thing)
+#     new_thing = Thing(description='Pen', value=3.90, owner=new_person.id) # Owner ID inexistente
+#     session.add(new_thing)
 
-    session.commit()
-    print ("OK Transaction")
+#     session.commit()
+#     print ("OK Transaction")
 
-except IntegrityError as e:
-    # Reverts Person and Things update
-    session.rollback()
-    print (f"Error: Integrity: {e}")
-except Exception as e:
-    session.rollback()
-    print (f"Error: Unexpected: {e}")
+# except IntegrityError as e:
+#     # Reverts Person and Things update
+#     session.rollback()
+#     print (f"Error: Integrity: {e}")
+# except Exception as e:
+#     session.rollback()
+#     print (f"Error: Unexpected: {e}")
 
 
 ## INTEGRITY ERROR HANDLING
@@ -92,10 +91,10 @@ except Exception as e:
 #     print(f"Full Error Message: \n{e}")
 
 ## Relationship dot notation
-print ("new_thing.person.name: ", new_thing.person.name)
+# print ("new_thing.person.name: ", new_thing.person.name)
 print ("- - +" *5)
 # List comprehension
-print ([item.description for item in new_person.things ])
+# print ([item.description for item in new_person.things ])
 
 
 ## UPDATE
@@ -109,6 +108,35 @@ if usuario:
     
     # 3. Guardamos los cambios
     session.commit()
+
+print ("- - +" *5)
+
+## UPDATE Masivo - Multiple records
+# import 'update'
+from sqlalchemy import update
+
+# Actualiza a todos los usuarios que tengan el nombre 'new_name'
+# no carga los valores en memoria
+stmt = (
+    update(Person)
+    .where(Person.name == 'new_name')
+    .values(name="New_Name")
+)
+
+session.execute(stmt)
+session.commit()
+
+## UPDATE con diccionario 
+# use setttr
+
+datos_nuevos = {"name": "new_name", "age": 55}
+usuario = session.get(Person, 4) # Update user with PK id == 4
+
+for clave, valor in datos_nuevos.items():
+    setattr(usuario, clave, valor)
+
+session.commit()
+
 
 
 
