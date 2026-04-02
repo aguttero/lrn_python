@@ -150,3 +150,36 @@ Configuración	                        Comportamiento al borrar al Padre
 nullable=True + Default	                Los hijos se ponen en NULL (desvinculación automática).
 nullable=True + passive_deletes="all"	Error de Integridad (bloqueo hasta desvinculación manual).
 
+# Aclaración Beneficios passive_deletes = "all"
+Entonces, ¿para qué sirve passive_deletes="all" si ya tengo nullable=False?
+
+Sirve principalmente por rendimiento y limpieza de logs:
+
+* Evitas consultas innecesarias: Sin passive_deletes, SQLAlchemy intentará cargar todos los objetos hijos en la memoria de Python solo para "ver qué hace con ellos" antes de borrar al padre. Si una persona tiene 10,000 "cosas", SQLAlchemy traerá 10,000 objetos a RAM innecesariamente. Con passive_deletes="all", SQLAlchemy ni siquiera mira los hijos; lanza el DELETE del padre directamente y deja que la DB falle rápido.
+
+* Logs de SQL más limpios: Verás en tu consola un solo DELETE fallido, en lugar de una ráfaga de UPDATEs fallidos seguidos de un DELETE.
+
+* Consistencia Total: Es la forma de decirle a SQLAlchemy: "No intentes gestionar la integridad tú, confío plenamente en las reglas que puse en SQLite".
+
+En resumen:
+nullable=False: Es tu seguro de vida (la regla física).
+passive_deletes="all": Es una optimización (evita que Python trabaje de más intentando "ayudar" donde no debe).
+En una app empresarial, se usan ambos para que el sistema sea robusto y eficiente.
+
+# Qué pasa si quitas el Event Listener pero dejas el passive_deletes?
+
+Sucedería lo peor para una app empresarial: corrupción de integridad referencial.
+
+* SQLAlchemy enviará el DELETE de la Persona (sin tocar las Cosas, porque es "pasivo").
+
+* SQLite recibirá el DELETE. Como no tiene el "interruptor" (PRAGMA) encendido, borrará a la Persona sin rechistar.
+
+* Resultado: Tus registros en la tabla Cosas ahora tienen un owner_id que apunta a alguien que ya no existe. Tus datos están rotos.
+
+* La combinación ganadora:
+Para que tu sistema sea de nivel empresarial, necesitas la cadena de mando completa:
+* PRAGMA foreign_keys=ON (vía Event Listener): Activa la vigilancia en el motor.
+* nullable=False: Crea la regla física de que no puede haber hijos sin padre.
+* passive_deletes="all": Optimiza a SQLAlchemy para que no trabaje de más y deje que la DB haga su trabajo.
+
+En resumen: El passive_deletes solo tiene sentido si hay alguien en la base de datos escuchando (el PRAGMA). Si apagas al guardia (el listener), el comando pasivo simplemente deja la puerta abierta para que los datos se desordenen.
