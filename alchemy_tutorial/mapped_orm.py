@@ -32,7 +32,29 @@ class Address(Base):
     
 # CREATE ENGINE    
 from sqlalchemy import create_engine
-engine = create_engine("sqlite:///./alchemy_tutorial/aclhemy_tutorial.db", echo=True)  
+engine = create_engine("sqlite+pysqlite:///./alchemy_tutorial/aclhemy_tutorial.db", echo=True)  
+
+# ENGINE METADATA
+def show_engine_metadata():
+
+    print ("- - ENGINE METADATA - - " * 2)    
+    # 1. Nombre del driver (DBAPI) que SQLAlchemy reporta
+    print(f"Driver (DBAPI) en uso: {engine.driver}")
+
+    # 2. Nombre del módulo Python que implementa el DBAPI
+    print(f"Módulo DBAPI: {engine.dialect.dbapi.__name__}")
+
+    # 3. Versión del adaptador (binding) de Python
+    print(f"Versión del adaptador: {engine.dialect.dbapi.version}")
+
+    # 4. Versión real de la librería SQLite3 instalada en el sistema
+    # (Se obtiene ejecutando una consulta SQL directamente)
+    with engine.connect() as conn:
+        sqlite_version = conn.exec_driver_sql("select sqlite_version()").scalar()
+        print(f"Versión de SQLite (C-library): {sqlite_version}")
+
+    print ("- - ENGINE METADATA END - - " * 2)    
+# show_engine_metadata()
 
 # EMIT CREATE TABLE
 Base.metadata.create_all(engine)
@@ -106,10 +128,14 @@ from sqlalchemy import select
 # session.flush()
 
 # DELETE 2
+print ("- - - -")
 stmt = select(User).where(User.name == "patrick")
 patrick = session.scalars(stmt).one()
-session.delete(patrick)
-session.commit()
+print ("patrick user:", patrick)
+print ("patrick.address: ", patrick.addresses)
+print ("- - - -")
+# session.delete(patrick)
+# session.commit()
 
 
 print ("- - - -")
