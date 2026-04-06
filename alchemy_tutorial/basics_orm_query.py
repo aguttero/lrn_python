@@ -36,6 +36,8 @@ session = Session()
 
 
 ## QUERY
+# Session.query es estilo legado
+# session.execute(select(Table).filter_by()).scalar es el standard para SQLA 2.0
 result = session.query(Person.id, Person.name, Person.age).all()
 print (result)
 print ("-*-" * 5)

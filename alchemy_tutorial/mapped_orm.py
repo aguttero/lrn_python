@@ -100,9 +100,21 @@ def simple_select():
     for user in session.scalars(stmt):
         print(user)
 
+def session_select_filter_by():
+    from sqlalchemy import select
+    sandy = session.execute(select(User).filter_by(name="sandy")).scalar_one()
+    print ("sandy_obj:", sandy)
+    print ("- - - -")
+    print ("sandy.addresses: ", sandy.addresses)
+    print ("- - - -")
+    print ("sandy.addresses[1]: ", sandy.addresses[1])
+
+
+session_select_filter_by()
+
 ## SELECT with JOIN
 
-from sqlalchemy import select
+# from sqlalchemy import select
 # stmt = (
 #     select(Address)
 #     .join(Address.user)
@@ -128,12 +140,12 @@ from sqlalchemy import select
 # session.flush()
 
 # DELETE 2
-print ("- - - -")
-stmt = select(User).where(User.name == "patrick")
-patrick = session.scalars(stmt).one()
-print ("patrick user:", patrick)
-print ("patrick.address: ", patrick.addresses)
-print ("- - - -")
+# print ("- - - -")
+# stmt = select(User).where(User.name == "patrick")
+# patrick = session.scalars(stmt).one()
+# print ("patrick user:", patrick)
+# print ("patrick.address: ", patrick.addresses)
+# print ("- - - -")
 # session.delete(patrick)
 # session.commit()
 
