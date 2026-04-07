@@ -32,7 +32,7 @@ class Address(Base):
     
 # CREATE ENGINE    
 from sqlalchemy import create_engine
-engine = create_engine("sqlite+pysqlite:///./alchemy_tutorial/aclhemy_tutorial.db", echo=True)  
+engine = create_engine("sqlite+pysqlite:///./alchemy_tutorial/data/alchemy_tutorial.db", echo=True)  
 
 # ENGINE METADATA
 def show_engine_metadata():
@@ -88,6 +88,7 @@ from sqlalchemy.orm import Session
 
 # Si abrimos session luego hay que cerrarla
 session = Session(engine)
+
 ## SIMPLE SELECT
 def simple_select():
     from sqlalchemy import select
@@ -110,7 +111,8 @@ def session_select_filter_by():
     print ("sandy.addresses[1]: ", sandy.addresses[1])
 
 
-session_select_filter_by()
+## RUN SELECTS
+# session_select_filter_by()
 
 ## SELECT with JOIN
 
@@ -133,6 +135,21 @@ session_select_filter_by()
 # sandy_address comes from previous select:
 # sandy_address.email_address = "sandy_cheeks@sqlalchemy.org"
 # session.commit()
+
+## BULK INSERT
+from sqlalchemy import insert
+session.execute(
+    insert(User),
+    [
+        {"name": "spongebob", "fullname": "Spongebob Squarepants"},
+        {"name": "sandy", "fullname": "Sandy Cheeks"},
+        {"name": "patrick", "fullname": "Patrick Star"},
+        {"name": "squidward", "fullname": "Squidward Tentacles"},
+        {"name": "ehkrabs", "fullname": "Eugene H. Krabs"},
+    ],
+)
+session.commit()
+
 
 ## DELETE 1
 # sandy = session.get(User, 2)
