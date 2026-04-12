@@ -8,8 +8,10 @@
                 "baseURL": "http://localhost:11434/v1"
             },
             "models":{
-                "qwen3:8b": {"name": "qwen3:8b"}
-
+                "yi-coder:1.5b": {"name": "yi-coder:1.5b"},
+                "phi4-mini:3.8b": {"name": "phi4-mini:3.8b"},
+                "llama3.2:3b":{"name": "llama3.2:3b"},
+                "qwen2.5-coder:7b": {"name": "qwen2.5-coder:7b"}
             }
         }
     },
