@@ -1,11 +1,3 @@
-.venv/
-*.db
-*.log
-.DS_Store
-__pycache__/
-opencode.json
-
-# Same as .opencodeignore
 # Env and credentials
 .aws/
 credentials/
