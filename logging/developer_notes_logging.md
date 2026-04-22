@@ -281,3 +281,69 @@ Al hacerlo así en todos tus archivos, tu consola o archivo de texto se verá mu
 #Resumen rápido:
 * En main.py: Haces el basicConfig (la configuración) Y creas el logger = logging.getLogger(__name__) (para los mensajes propios de main).
 * En los módulos: SOLO creas el logger = logging.getLogger(__name__).
+
+## Decorator logging
+Imagina que tu jefe te pide que cada vez que una función falle, se guarde un registro (Log) con el tipo de error.
+## Opción A: El método Manual (Lo que NO queremos)
+Aquí, el programador tiene que escribir el try/except y el print (o log) en cada una de las funciones.
+
+```python
+def guardar_usuario():
+    try:
+        # lógica...
+        print("Guardando...")
+    except DatabaseError as e:
+        print(f"[ERROR NIVEL: CRÍTICO] Falló la base de datos: {e}")
+def llamar_api():
+    try:
+        # lógica...
+        print("Llamando...")
+    except APIError as e:
+        print(f"[ERROR NIVEL: ALTO] Falló la API: {e}")
+```
+
+El problema: Si mañana el jefe dice: "Ahora quiero que el log incluya la hora", ¡tienes que cambiar 100 funciones a mano! Es aburrido y vas a cometer errores.
+------------------------------
+## Opción B: El Decorador (El estándar profesional)
+Un decorador es como una "funda" o un "escudo" que le pones a cualquier función para darle superpoderes sin modificar su interior. [1] 
+Vamos a crear un decorador que use tus clases de error (AppError, DatabaseError, etc.) para decidir qué tan grave es el log. [2] 
+
+```python
+import functools
+# Este es nuestro "Ayudante de Log"
+def estandarizar_log(func):
+    @functools.wraps(func)
+    def envoltorio(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except DatabaseError as e:
+            print(f"[LOG - NIVEL CRÍTICO]: {e}. Origen: {e.original_exc}")
+            raise # Volvemos a lanzar el error para que la app sepa que falló
+        except APIError as e:
+            print(f"[LOG - NIVEL ALTO]: {e}. Status: {e.status_code}")
+            raise
+        except AppError as e:
+            print(f"[LOG - NIVEL MEDIO]: {e}")
+            raise
+    return envoltorio
+# --- AHORA MIRA QUÉ LIMPIO QUEDA TU CÓDIGO ---
+
+@estandarizar_log
+def guardar_en_db():
+    # Simulamos un error de base de datos
+    raise DatabaseError("No hay espacio en disco", original_exc="OSError: Disk Full")
+
+@estandarizar_log
+def consultar_servicio():
+    # Simulamos un error de API
+    raise APIError("Timeout", status_code=504)
+```
+
+## ¿Por qué esto es mejor? (La explicación para el junior)
+
+   1. Centralización: Si quieres cambiar el formato del log (por ejemplo, enviarlo a un archivo .txt), solo cambias el código dentro del decorador una sola vez.
+   2. Limpieza: Tus funciones como guardar_en_db() solo tienen la lógica del negocio. No están "sucias" con códigos de logs por todos lados.
+   3. Consistencia: Te aseguras de que todos los errores de base de datos se vean igual en los logs, sin importar qué programador escribió la función.
+
+¿Te das cuenta de cómo el decorador "atrapa" el error por ti y sabe qué nivel ponerle según la clase de la excepción?
+¿Te gustaría intentar escribir una función pequeña y aplicarle este decorador para ver cómo reacciona?**
