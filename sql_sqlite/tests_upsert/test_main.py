@@ -37,10 +37,15 @@ def test_main():
     # dict of json data from api response
     all_groups_dict = api.fetch_groups()
     
-    #UPsert list of json to DB
-    db.upsert_dict(all_groups_dict)
+    # UPsert list of json to DB
+    ## simple sesion.add
+    # db.insert_dict_session_add(all_groups_dict)
 
-    
+    ## with session.merge
+    upsert_summary = db.upsert_dict_claude_session_merge(all_groups_dict)
+    print("upsert_summary:", upsert_summary)
+    print ("- - -")
+
     return 0
 
 ## TEST RUN CODE

@@ -1,5 +1,52 @@
-## CASCADE DELETE - THREE APROACHS
-# Tres estrategias principales dependiendo de qué quieras que pase con los "hijos" (las cosas) cuando eliminas al "padre" (la persona).
+# SETUP ORM Database and Engine
+ver `sql_lite/test_upsert/`
+
+
+
+# ORM Mapping model
+## session.add (ORM) vs session.execute (CORE)
+
+En SQLAlchemy, la elección depende de si quieres trabajar con objetos (ORM) o con rendimiento puro (Core).
+Aquí tienes la comparativa de session.add() vs. session.execute(insert(...)):
+## 1. session.add(objeto_instancia) (Estilo ORM)
+Es la forma estándar de trabajar con clases Mapped. Creas una instancia de tu clase y la añades a la sesión.
+
+* Pros:
+* Identidad: El objeto queda vinculado a la sesión. Si cambias un atributo después del .add(), SQLAlchemy lo detectará y actualizará automáticamente en el siguiente flush.
+   * Relaciones: Maneja automáticamente las relaciones (p. ej., si insertas un "Padre" con una lista de "Hijos", SQLAlchemy se encarga de las llaves foráneas).
+   * Facilidad: Recuperas el ID generado inmediatamente en el objeto tras hacer session.commit() o flush().
+* Contras:
+* Velocidad: Es más lento para inserciones masivas (miles de registros) porque SQLAlchemy debe rastrear el estado de cada objeto individualmente.
+
+## 2. session.execute(insert(Modelo).values(...)) (Estilo Core/Bulk)
+Aquí tratas a la base de datos de forma más directa, enviando un comando SQL INSERT.
+
+* Pros:
+* Rendimiento: Es significativamente más rápido para inserciones masivas (Bulk Inserts). Envía los datos directamente sin crear instancias pesadas de Python para cada fila.
+   * Menos Memoria: No carga los objetos en el "Identity Map" de la sesión, lo que ahorra RAM.
+* Contras:
+* Desconexión: Los datos insertados no se convierten automáticamente en objetos que puedas seguir usando en tu código; son solo registros en la DB.
+   * Manual: No gestiona automáticamente las relaciones complejas ni la cascada de datos.
+
+------------------------------
+## Resumen comparativo
+
+| Característica | session.add() | session.execute(insert()) |
+|---|---|---|
+| Uso principal | Lógica de negocio y pocos registros. | Carga masiva de datos (Batch). |
+| Rastreo (Tracking) | Sí, el objeto vive en la sesión. | No, es una operación de "dispara y olvida". |
+| Velocidad | Lenta (overhead de objetos). | Muy alta (directo a SQL). |
+| Relaciones | Automáticas. | Manuales. |
+
+Recomendación: Usa .add() por defecto para mantener la integridad de tu lógica de objetos. Solo cambia a .execute() si notas que tu script se vuelve lento al procesar miles de filas a la vez.
+¿Estás trabajando con procesamiento de datos por lotes o es una interacción normal de usuario (un registro a la vez)? Bolding
+
+
+
+
+# CASCADE DELETE - THREE APROACHS
+## Tres estrategias principales dependiendo de qué quieras que pase con los "hijos" (las cosas) cuando eliminas al "padre" (la persona).
+
 
 1. La Opción Profesional: "Cascade Delete"
 Si tu lógica de negocio dicta que si una persona desaparece, sus cosas ya no tienen sentido, debes configurar el cascada en tu modelo. Esto delega la responsabilidad a SQLAlchemy para que borre todo en orden.

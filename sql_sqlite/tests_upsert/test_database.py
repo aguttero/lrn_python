@@ -8,10 +8,9 @@ import test_utils as utils
 import logging
 
 # from typing import List, Optional, Type
+#from sqlalchemy.dialects.sqlite import insert
 
-from sqlalchemy.dialects.sqlite import insert
-
-from sqlalchemy import create_engine, select, or_
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 #from sqlalchemy.exc import SQLAlchemyError
 
@@ -45,9 +44,7 @@ def _get_session() -> Session:
 
 ## END LAZY ENGINE INITIALIZATION
 
-def upsert_dict(input_dict):
-    # from sqlalchemy.dialects.sqlite import insert
-    
+def insert_dict_session_add(input_dict):
     counter = 0
     with _get_session() as session:
         # iterate list of dictionaries:
@@ -62,20 +59,69 @@ def upsert_dict(input_dict):
             session.add(new_item)
             counter +=1
 
-        session.commit()        
+        session.commit() # puede ir dentro o fuera del loop
 
         logger.debug(f"list_item type: {type(list_item)} - new_item type: {type(new_item)}, value: {new_item}")
     logger.info(f"Total records upserted: {counter}")
-        
 
-    # insert_stmt = insert(my_table).values(
-    # id="some_existing_id", data="inserted value")
+def upsert_dict_claude_session_merge(api_response: dict):
+    """
+    Upsert Groups from an API response using group_id as the natural key.
+    Uses session.merge() after resolving the internal PK via group_id lookup (PREFETCH).
 
-    # do_update_stmt = insert_stmt.on_conflict_do_update(
-    #     index_elements=["id"], set_=dict(data="updated value")
-    # )
+    Args:
+        api_response dict: Must include 'group_id'.
 
-    # print(do_update_stmt)
-    # do_nothing_stmt = insert_stmt.on_conflict_do_nothing(index_elements=["id"])
+    logs:
+        Summary dict: {"inserted": int, "updated": int, "skipped": int, "errors": list}
+    """
+    
+    summary = {"inserted": 0, "updated": 0, "skipped": 0, "errors": []}
+    
+    with _get_session() as session:
+        # Single prefetch — map group_id → internal PK for the whole batch
+        existing: dict = {
+            group_id: pk
+            for pk, group_id in session.query(Group.id, Group.group_id).all()
+        }
+    print ("Dicciontario de PKs:\n", existing)
 
-    # print(do_nothing_stmt)
+    for record in api_response["groupInfoList"]:
+        api_group_id = record.get("groupId","").strip()  # strip() para limpiar
+        sqlite_date = utils.convert_to_sqlite_date(record.get("createdDate"))
+        today = date.today() 
+
+        if not api_group_id:
+            summary["skipped"] += 1
+            summary["errors"].append({"record": record, "reason": "Missing group_id"})
+            continue
+
+        try:
+            internal_pk = existing.get(api_group_id)   # None → INSERT, int → UPDATE
+            is_new = internal_pk is None
+
+            group_record = Group(
+                id             = internal_pk,           # None lets DB assign PK on insert
+                group_id       = api_group_id,
+                name           = record.get("groupName","TBD group name"),
+                created_date   = sqlite_date,
+                last_sync      = today,                 # merge does not trigger the onupdte Table field setting
+                is_default_grp = record.get("isDefaultGroup"),
+            )
+
+            session.merge(group_record)                        # INSERT or UPDATE based on PK
+
+            if is_new:
+                existing[api_group_id] = ...            # guard intra-batch duplicates - updates table again if second api hit is received for same group_id
+                summary["inserted"] += 1
+            else:
+                summary["updated"] += 1
+
+        except Exception as exc:
+            session.rollback()
+            summary["errors"].append({"record": record, "reason": str(exc)})
+            summary["skipped"] += 1
+
+    session.commit()
+    return summary
+

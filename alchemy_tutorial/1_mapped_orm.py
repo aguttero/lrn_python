@@ -32,6 +32,7 @@ class Address(Base):
     
 # CREATE ENGINE    
 from sqlalchemy import create_engine
+# path relativo a directorio de ejecución del bash: python3 main.py
 engine = create_engine("sqlite+pysqlite:///./alchemy_tutorial/data/alchemy_tutorial.db", echo=True)  
 
 # ENGINE METADATA
