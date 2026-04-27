@@ -59,7 +59,7 @@ class Group(Base):
     agreements: Mapped[List["Agreement"]] = relationship(back_populates="group")
     
     def __repr__(self) -> str:
-        return f"Group(name={self.name!r}, pk_id={self.id!r}, group_id{self.group_id})"
+        return f"Group(name={self.name!r}, pk_id={self.id!r}, group_id={self.group_id})"
 
 class Agreement(Base):
     """Agreement model mapped to agreement table. All agreements belong to a Group."""
