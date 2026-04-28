@@ -10,7 +10,7 @@ import logging
 # from typing import List, Optional, Type
 #from sqlalchemy.dialects.sqlite import insert
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, false
 from sqlalchemy.orm import sessionmaker, Session
 #from sqlalchemy.exc import SQLAlchemyError
 
@@ -63,6 +63,33 @@ def insert_dict_session_add(input_dict):
 
         logger.debug(f"list_item type: {type(list_item)} - new_item type: {type(new_item)}, value: {new_item}")
     logger.info(f"Total records upserted: {counter}")
+
+
+# def insert_dict_insert():
+## OJO ESTO NO FUNCIONA
+#     #from sqlalchemy.dialects.sqlite import insert
+#     from sqlalchemy.dialects.sqlite import insert
+#     sqlite_date = utils.convert_to_sqlite_date("2026-03-02T08:23:52-08:00")
+#     with _get_session() as session:
+#         insert_stmt = insert(Group).values(
+#             id=None,
+#             group_id="test_groupId",
+#             name="test_groupName",
+#             created_date= sqlite_date,
+#             is_default_grp= false
+#             )
+#     session.execute(insert_stmt)
+#     session.commit()
+#     logger.warning("watch here!!")
+
+    # do_update_stmt = insert_stmt.on_conflict_do_update(
+    #     index_elements=["id"], set_=dict(data="updated value")
+    # )
+
+    # print(do_update_stmt)
+    # do_nothing_stmt = insert_stmt.on_conflict_do_nothing(index_elements=["id"])
+
+    # print(do_nothing_stmt)
 
 def upsert_dict_claude_session_merge(api_response: dict):
     """
