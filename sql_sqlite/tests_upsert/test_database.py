@@ -136,6 +136,8 @@ def upsert_dict_claude_session_merge(api_response: dict):
                 is_default_grp = record.get("isDefaultGroup"),
             )
 
+            print ("Group:", group_record)
+            print ("- - - -")
             session.merge(group_record)                        # INSERT or UPDATE based on PK
 
             if is_new:

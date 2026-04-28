@@ -57,9 +57,11 @@ class Group(Base):
     is_default_grp: Mapped[bool]
     
     agreements: Mapped[List["Agreement"]] = relationship(back_populates="group")
-    
+
     def __repr__(self) -> str:
-        return f"Group(name={self.name!r}, pk_id={self.id!r}, group_id={self.group_id})"
+        return f"Group(name={self.name!r}, pk_id={self.id!r}, group_id={self.group_id}, created_date={self.created_date!r}, last_sync={self.last_sync!r}, admin_email={self.admin_email!r}, is_default_grp={self.is_default_grp!r} )"
+
+        # return f"Group(name={self.name!r}, pk_id={self.id!r}, group_id={self.group_id})"
 
 class Agreement(Base):
     """Agreement model mapped to agreement table. All agreements belong to a Group."""

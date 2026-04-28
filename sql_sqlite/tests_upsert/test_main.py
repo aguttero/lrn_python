@@ -44,7 +44,8 @@ def test_main():
     # db.insert_dict_session_add(all_groups_dict)
 
     ## simple insert with insert
-    db.insert_dict_insert()
+    ## NO FUNCIONA
+    # db.insert_dict_insert()
 
     ## with session.merge
     upsert_summary = db.upsert_dict_claude_session_merge(all_groups_dict)
