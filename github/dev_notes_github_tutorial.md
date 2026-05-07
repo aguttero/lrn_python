@@ -48,6 +48,31 @@ https://www.youtube.com/watch?v=QV0kVNvkMxc
     git status
     git log [--oneline]
 
+# Branching
+    Create:
+        git branch <new branch name>
+        git checkout -b <new branch name>
+    
+    List:   git branch -a
+    Switch: git checkout <branch name>
+    Commit: as always
+    push: git push origin <branch name> -u [la primeravez]
+
+    Delete: cambiar a main
+            git branch -d (post merge) / -D (fuerza delete) <branch name>
+
+    Delte remote: git push origin --delete <nombre-de-la-rama>
+
+
+    Merge:  ir a la branch en la que se quieren recibir los cambios
+            git checkout main
+            git merge branch name (feature-a)
+
+
+
+
+
+
 
 
 
