@@ -63,11 +63,9 @@ https://www.youtube.com/watch?v=QV0kVNvkMxc
 
     Delte remote: git push origin --delete <nombre-de-la-rama>
 
-
     Merge:  ir a la branch en la que se quieren recibir los cambios
             git checkout main
             git merge branch name (feature-a)
-
 
 
 
