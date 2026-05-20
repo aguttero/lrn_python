@@ -118,6 +118,24 @@ https://www.youtube.com/watch?v=QV0kVNvkMxc
         Run git add .gitignore to mark the conflict as resolved.
         Run git commit -m "Merge branch 'feature-branch' and resolve .gitignore conflict" to complete the merge. 
 
+# Rename GitHub Git Repo
+
+Para cambiar el nombre de todo el repositorio principal, debes modificarlo primero en la web de GitHub y luego actualizar la dirección URL en tu computadora local.
+## 1. Cambiar el nombre en GitHub (Web)
+
+   1. Entra a tu repositorio en GitHub.
+   2. Ve a la pestaña Settings (Configuración).
+   3. En la sección Repository name, escribe el nuevo nombre.
+   4. Haz clic en Rename.
+
+## 2. Actualizar tu repositorio local (Terminal)
+Ejecuta este comando en tu terminal para actualizar la conexión con la nueva URL (reemplaza con tus datos):
+    git remote set-url origin <https://githunuevo repo>
+
+## 3. Verificar el cambio
+Confirma que la dirección se actualizó correctamente con este comando:
+    git remote -v
+
 
 
 

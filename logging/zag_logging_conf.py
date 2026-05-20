@@ -1,7 +1,9 @@
 # En main.py
 # LOGGER CONFIG
 import logging
+from datetime import datetime
 
+# LOGGER CONFIG START
 # SET LEVEL for each Handler
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
@@ -18,7 +20,7 @@ logging.basicConfig(
 
 # CREATE LOGGER OBJECT
 logger = logging.getLogger(__name__)
-## END LOGGER CONFIG
+## LOGGER CONFIG END
 
 # IMPORT MODULES - AFTER LOGGER CONFIG
 # import other_module as mod
