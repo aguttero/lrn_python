@@ -43,7 +43,7 @@ def main():
     # RUN YOUR PROCESS
     end_time = time.time()
     exec_time = end_time - start_time
-    logger.debug(f"MAIN END - exec_time= {exec_time:.4f} seconds, end_time={start_time}")
+    logger.info(f"MAIN END - exec_time= {exec_time:.4f} seconds, end_time={start_time}")
     return 0
 
 
@@ -51,3 +51,19 @@ if __name__ == "__main__":
     exit_code: int = main()
     print (f"exit code: {exit_code}")
     exit(exit_code)
+
+# IN EACH MODULE:
+import logging
+logger = logging.getLogger(__name__)
+#######
+
+# TEST LOGGING MAIN:
+texto = "texto main"
+logger.info(f"{texto}")
+logger.error("Error Main")
+
+
+# TEST LOGGING MODULEs:
+texto = "texto mod"
+logger.debug(f"{texto}")
+logger.error("Error Mod")
