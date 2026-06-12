@@ -15,6 +15,18 @@ for signer in signers:
 
 print("email_roles:", email_roles)
 
+from collections import Counter
+
+# Extract all values for the key
+all_values = [d[key] for d in data_list if key in d]
+
+# Count frequencies
+counts = Counter(all_values)
+
+# Filter out values that appear more than once
+all_duplicates = [val for val, count in counts.items() if count > 1]
+
+
 # 2. Separate into repeated and non-repeated dictionaries
 # repeated_signers = {}
 # non_repeated_signers = {}
