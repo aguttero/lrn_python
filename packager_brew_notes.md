@@ -20,7 +20,13 @@ https://brew.sh/
 brew install python@3.13
 
 ## install  notes in mac with python 3.14:
-=> python@3.13
+==> Summary
+🍺  /usr/local/Cellar/python@3.13/3.13.14_1: 3,620 files, 68.2MB
+==> Running `brew cleanup python@3.13`...
+Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+==> Caveats
+==> python@3.13
 Python is installed as
   /usr/local/bin/python3.13
 
